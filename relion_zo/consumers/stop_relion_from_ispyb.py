@@ -53,18 +53,23 @@ class Relionstop(CommonService):
 
         self.log.info("%s has asked to be stopped" % (str(session_path)))
 
+
         if run_files:
-        for r in run_files:
-            file_to_delete = session_path.joinpath(
-                relion_project_dir).joinpath(r)
+            for r in run_files:
+                file_to_delete = session_path.joinpath(
+                    relion_project_dir).joinpath(r)
 
-            if file_to_delete.exists():
-                self.log.info("%s will be removed " % (file_to_delete))
-                try:
-                    os.remove(str(file_to_delete))
-                except:
-                    self.log.info(
-                        "Nothing to delete %s has been deleted " % file_to_delete)
+                if file_to_delete.exists():
+                    self.log.info("%s will be removed " % (file_to_delete))
+                    try:
+                        os.remove(str(file_to_delete))
+                    except:
+                        self.log.info(
+                            "Nothing to delete %s has been deleted " % file_to_delete)
 
+        else:
+            self.log.info("No instances of relion-it running for {}".format(session_path))
+            self.transport.ack(header)
         # acknowledge in both cases whether file was deleted or if it doesn't exist
+
         self.transport.ack(header)
