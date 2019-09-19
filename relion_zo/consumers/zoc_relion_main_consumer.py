@@ -16,9 +16,7 @@ try:
 except ImportError:
     print("Runpy cannot be found")
 
-# TODO: relion_it -- continue to start pipeliner
-# TODO: on rebsubmission we have to remove the RUNNING_*
-# TODO: file and wait because the raw is being looked at we aren't linking agian
+
 
 # Active MQ Scipion Consumer started as gda2
 #relion-it-constants
@@ -28,7 +26,7 @@ RUNNING_FILE = 'RUNNING_RELION_IT'
 SETUP_CHECK_FILE = 'RELION_IT_SUBMITTED_JOBS'
 PREPROCESS_SCHEDULE_PASS1 = 'PREPROCESS'
 PREPROCESS_SCHEDULE_PASS2 = 'PREPROCESS_PASS2'
-OPTIONS_FILE = 'relion-it-options.py' #'userrelion_it_options.py'
+OPTIONS_FILE = 'relion-it-options.py' 
 SECONDPASS_REF3D_FILE = 'RELION_IT_2NDPASS_3DREF'
 #
 
@@ -173,12 +171,12 @@ class RelionRunner(CommonService):
 
         if os.path.isfile(RUNNING_FILE):
             self.log.error(" RELION_IT: ERROR: {} is already present: delete this file and make sure no other copy of this script is running. Exiting now ...".format(RUNNING_FILE))
-            #bad_request()
+            
             exit(0)
 
         # Also make sure the preprocessing pipeliners are stopped before re-starting this script
         for checkfile in ('RUNNING_PIPELINER_' + PREPROCESS_SCHEDULE_PASS1, 'RUNNING_PIPELINER_' + PREPROCESS_SCHEDULE_PASS2):
-            #bad_request()
+            
             if os.path.isfile(checkfile):
                 self.log.error(" RELION_IT: ERROR: {} is already present: delete this file and make sure no relion_pipeliner job is still running. Exiting now ...".format(checkfile))
                 exit(0)
@@ -202,10 +200,6 @@ class RelionRunner(CommonService):
 
         movies_dir = Path(visit_dir/'raw')
         movies_dir.mkdir(parents=True, exist_ok=True)
-
-        #visit dir : session - folder
-        #movies dir # raw folder belongs to session
-        # relion folder # relion project directory
 
 
         return visit_dir,movies_dir,relion_dir
