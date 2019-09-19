@@ -5,7 +5,7 @@ import workflows.recipe
 
 
 class Relionsubmitstop(CommonService):
-    '''A zocalo service for to stop Relion RELION_SUBMITTED_JOBS from IsPyB '''
+    '''A zocalo service for to stop Relion RELION_SUBMITTED_JOBS and RUNNING_* for relion from IsPyB '''
 
     # Human readable service name
     _service_name = "relion.relion_stop_pipeline"
@@ -45,11 +45,11 @@ class Relionsubmitstop(CommonService):
         session_name = session_path.name
 
         relion_project_dir = Path.joinpath(session_path).joinpath('processed').joinpath('relion_' + session_name)
-        self.log.info(relion_project_dir)
+
 
         relion_jobs_file = Path.joinpath(relion_project_dir).joinpath('RELION_IT_SUBMITTED_JOBS')
 
-        if relion_jobs_file.exists():
+        if relion_jobs_file:
             try:
                 os.remove(str(relion_jobs_file))
                 self.log.info("{} submitted jobs file was removed ".format(relion_jobs_file))    
