@@ -18,7 +18,7 @@ class Relionsubmitstop(CommonService):
 
 		"""
 
-        queue_name = "relion.relion_test"
+        queue_name = "relion.relion_stop_pipeline"
         self.log.info("queue that is being listened to is %s" % queue_name)
         workflows.recipe.wrap_subscribe(self._transport, queue_name,
                                         self.stop_relion, acknowledgement=True, log_extender=self.extend_log,
