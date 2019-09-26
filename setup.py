@@ -7,6 +7,7 @@ from setuptools import setup, find_packages
 requirements = ["workflows", "zocalo","pathlib2"]
 setup_requirements = []
 
+
 setup(
     author="Joshua Lobo",
     author_email="scientificsoftware@diamond.ac.uk",
@@ -20,7 +21,7 @@ setup(
         "workflows.services": [
             "RelionRunner = relion_zo.consumers.zoc_relion_main_consumer:RelionRunner",
             "Relionstop = relion_zo.consumers.stop_relion_from_ispyb:Relionstop",
-            " Relionsubmitstop = relion_zo.consumers.stop_relion_pipeline:Relionsubmitstop",
+            "Relionsubmitstop = relion_zo.consumers.stop_relion_pipeline:Relionsubmitstop",
         ],
     },
     install_requires=requirements,
@@ -30,7 +31,7 @@ setup(
     packages=find_packages(),
     python_requires='>=2.7.13,!= 3.0.*',
     setup_requires=setup_requirements,
-    version="0.2",
+    version="0.4",
     zip_safe=False,
 )
 
