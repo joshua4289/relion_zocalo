@@ -28,11 +28,8 @@ class Relionsubmitstop(CommonService):
 
     def stop_relion(self, rw, header, message):
         self.log.info("Stop relion through zocalo")
-        
-        try:
-            from pathlib2 import Path
-        except:
-            from pathlib import Path
+
+        from pathlib2 import  Path
 
         ispyb_msg = message['session_path']
 
@@ -48,28 +45,44 @@ class Relionsubmitstop(CommonService):
 
 
         relion_jobs_file = Path.joinpath(relion_project_dir).joinpath('RELION_IT_SUBMITTED_JOBS')
+        ispyb_jobs_file = Path.joinpath(ispyb_msg_path).joinpath('RELION_IT_SUBMITTED_JOBS')
 
-        if relion_jobs_file:
+        #start the remove only both exists this maybe opens you to timing issues needs improvement
+        #remove from both dirs
+
+        if relion_jobs_file and ispyb_msg_path:
             try:
                 os.remove(str(relion_jobs_file))
-                self.log.info("{} submitted jobs file was removed ".format(relion_jobs_file))    
+                self.log.info("{} submitted jobs file was removed ".format(relion_jobs_file))
+                os.remove(str(ispyb_msg_path))
+                self.log.info("{} submitted jobs file was removed ".format(ispyb_jobs_file))
+
             except:
                 self.log.info("file {} not found".format(relion_jobs_file))
-                
+                self.log.info("file {} not found".format(ispyb_jobs_file))
+
         run_files = [f for f in os.listdir(str(relion_project_dir)) if re.match(r'RUNNING*', f)]
+        
 
         self.log.info("%s has asked to be stopped" % (str(session_path)))
 
         for r in run_files:
             file_to_delete = session_path.joinpath('processed').joinpath(relion_project_dir).joinpath(r)
+            file_to_delete_ispyb = session_path.joinpath('.ispyb').joinpath('processing').joinpath(r)
 
             if file_to_delete.exists:
                 self.log.info("%s will be removed " % (file_to_delete))
+                self.log.info("%s ispyb file will be removed " % (file_to_delete_ispyb))
+
                 try:
                     os.remove(str(file_to_delete))
+                    os.remove(str(file_to_delete_ispyb))
+
+
                 except:
                     self.log.info("Nothing to delete %s has been deleted " % file_to_delete)
 
-        # acknowledge in both cases whether file was deleted or if it doesn't exist
+
+        #in both cases ack
         self.transport.ack(header)
 
