@@ -4,13 +4,6 @@ import workflows.recipe
 from subprocess import PIPE, Popen
 import json
 import os, re
-
-
-try:
-    import pathlib2
-except:
-    import pathlib
-
 try:
     import runpy
 except ImportError:
@@ -52,24 +45,38 @@ class RelionRunner(CommonService):
                                         self.run_relion, acknowledgement=True, log_extender=self.extend_log,
                                         allow_non_recipe_messages=True)
 
-    
+    def copy_running_to_frontend(self,relion_dir,ispyb_msg_path):
+
+        ''' finds the RUNNING_* and RELION_IT_SUBMITTED files in relion project and copies them to .ispyb/processing '''
+
+        import os
+        import shutil
+        import glob
+
+        cwd = relion_dir
+        os.chdir(str(relion_dir))
+
+        for f in glob.glob(r'RUNNING_*'):
+            shutil.copy(f,ispyb_msg_path)
+            #add logging
+            self.log.info("copied {} to {}".format(str(f),str(ispyb_msg_path)))
+
+
+
 
     def run_relion(self,rw,header, message):
         """ main method to do all the setup and run relion-it """
 
         self.log.info("Start relion through zocalo")
-        try:
-            from pathlib2 import Path
-        except:
-            from pathlib import Path
 
-
+        from pathlib2 import Path
         import subprocess
         from subprocess import Popen
         import sys
 
         ispyb_msg = message ['session_path']
         ispyb_msg_path = Path(ispyb_msg)
+        ispyb_msg_dir = Path(ispyb_msg_path).parent
 
         #SETUP: folders belonging to dls structure
 
@@ -78,7 +85,12 @@ class RelionRunner(CommonService):
         self.log.info("visit: %s" %visit_dir)
         self.log.info("workspace: %s " %workspace_dir)
         self.log.info("relion_dir: %s " %relion_dir)
+
+        
+
         self.link_movies(relion_dir)
+
+        #self.log.info("type of relion_dir is %s " %type(relion_dir))
         #now that folder setup is complete and linking is done module load EM/relion_it
 
 
@@ -145,17 +157,15 @@ class RelionRunner(CommonService):
                 'module load EM/relion_it;',
                 'dls-python',relion_it_script,str(user_options_file),'--continue')
 
-        
-
-
-
-
         cmd_to_run = " ".join(cmd)
+
         import subprocess
 
         # this is intentional because the running_relion it checks crashes consumers
         self.transport.ack(header)
         subprocess.Popen(cmd_to_run,stdout=logfile_out,stderr=logfile_err,shell=True)
+
+        self.copy_running_to_frontend(str(relion_dir),str(ispyb_msg_dir))
 
         self.log.info("relion processing started ")
 
@@ -171,22 +181,22 @@ class RelionRunner(CommonService):
 
         if os.path.isfile(RUNNING_FILE):
             self.log.error(" RELION_IT: ERROR: {} is already present: delete this file and make sure no other copy of this script is running. Exiting now ...".format(RUNNING_FILE))
-            
-            exit(0)
+            #don't crash consumer just log an error
+            #exit(0)
 
         # Also make sure the preprocessing pipeliners are stopped before re-starting this script
         for checkfile in ('RUNNING_PIPELINER_' + PREPROCESS_SCHEDULE_PASS1, 'RUNNING_PIPELINER_' + PREPROCESS_SCHEDULE_PASS2):
             
             if os.path.isfile(checkfile):
                 self.log.error(" RELION_IT: ERROR: {} is already present: delete this file and make sure no relion_pipeliner job is still running. Exiting now ...".format(checkfile))
-                exit(0)
+
+                #exit(0)
 
     def setup_folder_str(self,folder_path):
         """ sets up the folder structure relative to the messsage path """
-        try:
-            from  pathlib2 import Path
-        except:
-            from pathlib import Path
+
+
+        from pathlib2 import Path
 
         visit_dir = folder_path.parents[2]
         workspace_dir = visit_dir / 'processed'
@@ -200,6 +210,11 @@ class RelionRunner(CommonService):
 
         movies_dir = Path(visit_dir/'raw')
         movies_dir.mkdir(parents=True, exist_ok=True)
+        
+        
+        
+
+
 
 
         return visit_dir,movies_dir,relion_dir
@@ -224,12 +239,10 @@ class RelionRunner(CommonService):
         # "filesPattern": "*.mrc"
         # ln -s ../raw Movies
         # symlink /dls/m02/data/2019/cm22936-1/raw/ Movies
+        
 
-        try:
-            from pathlib import Path
-        except:
-            from pathlib2 import Path
 
+        from pathlib2 import Path
         import os
 
 
