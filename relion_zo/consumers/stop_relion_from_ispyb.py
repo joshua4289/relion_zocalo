@@ -25,11 +25,8 @@ class Relionstop(CommonService):
 
     def stop_relion(self, rw, header, message):
         self.log.info("Stop relion through zocalo")
-        import os
-        try:
-            from pathlib2 import Path
-        except:
-            from pathlib import Path
+
+        from pathlib2 import  Path
 
         ispyb_msg = message['session_path']
 
@@ -37,19 +34,13 @@ class Relionstop(CommonService):
 
         import os
         import re
-        import sys
-
-        # the regular expression covers all cases of RUNNING_*
 
         session_path = ispyb_msg_path.parents[2]
         session_name = session_path.name
 
-        relion_project_dir = Path.joinpath(session_path).joinpath(
-            'processed').joinpath('relion_' + session_name)
-        self.log.info(relion_project_dir)
+        relion_project_dir = Path.joinpath(session_path).joinpath('processed').joinpath('relion_' + session_name)
 
-        run_files = [f for f in os.listdir(
-            str(relion_project_dir)) if re.match(r'RUNNING*', f)]
+        run_files = [f for f in os.listdir(str(relion_project_dir)) if re.match(r'RUNNING*', f)]
 
         self.log.info("%s has asked to be stopped" % (str(session_path)))
 
@@ -58,18 +49,21 @@ class Relionstop(CommonService):
             for r in run_files:
                 file_to_delete = session_path.joinpath(
                     relion_project_dir).joinpath(r)
+                file_to_delete_ispyb = session_path.joinpath('.ispyb').joinpath('processed').joinpath(r)
 
                 if file_to_delete.exists():
                     self.log.info("%s will be removed " % (file_to_delete))
+                    self.log.info("%s ispyb file will be removed " % (file_to_delete_ispyb))
                     try:
                         os.remove(str(file_to_delete))
+                        os.remove(str(file_to_delete_ispyb))
                     except:
                         self.log.info(
                             "Nothing to delete %s has been deleted " % file_to_delete)
 
         else:
             self.log.info("No instances of relion-it running for {}".format(session_path))
-            self.transport.ack(header)
+
         # acknowledge in both cases whether file was deleted or if it doesn't exist
 
         self.transport.ack(header)
