@@ -68,7 +68,7 @@ class Relionsubmitstop(CommonService):
 
         for r in run_files:
             file_to_delete = session_path.joinpath('processed').joinpath(relion_project_dir).joinpath(r)
-            file_to_delete_ispyb = session_path.joinpath('.ispyb').joinpath('processing').joinpath(r)
+            file_to_delete_ispyb = session_path.joinpath('.ispyb').joinpath('processed').joinpath(r)
 
             if file_to_delete.exists:
                 self.log.info("%s will be removed " % (file_to_delete))
