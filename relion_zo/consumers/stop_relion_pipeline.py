@@ -45,7 +45,7 @@ class Relionsubmitstop(CommonService):
 
 
         relion_jobs_file = Path.joinpath(relion_project_dir).joinpath('RELION_IT_SUBMITTED_JOBS')
-        ispyb_jobs_file = Path.joinpath(ispyb_msg_path).joinpath('RELION_IT_SUBMITTED_JOBS')
+        ispyb_jobs_file = Path.joinpath(ispyb_msg_path.parent).joinpath('RELION_IT_SUBMITTED_JOBS')
 
         #start the remove only both exists this maybe opens you to timing issues needs improvement
         #remove from both dirs
@@ -62,7 +62,7 @@ class Relionsubmitstop(CommonService):
                 self.log.info("file {} not found".format(ispyb_jobs_file))
 
         run_files = [f for f in os.listdir(str(relion_project_dir)) if re.match(r'RUNNING*', f)]
-        
+
 
         self.log.info("%s has asked to be stopped" % (str(session_path)))
 
