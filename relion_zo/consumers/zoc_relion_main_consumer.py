@@ -69,7 +69,12 @@ class RelionRunner(CommonService):
 
         self.log.info("Start relion through zocalo")
 
-        from pathlib2 import Path
+        if sys.version_info[0] > 2:
+            from pathlib import Path
+        
+        else:
+            from pathlib2 import Path
+        
         import subprocess
         from subprocess import Popen
         import sys
@@ -90,25 +95,20 @@ class RelionRunner(CommonService):
 
         self.link_movies(relion_dir)
 
-        #self.log.info("type of relion_dir is %s " %type(relion_dir))
-        #now that folder setup is complete and linking is done module load EM/relion_it
-
-
         try:
 
-
-
-
-            relion_pipeline_home = os.getenv('RELION_PIPELINE_HOME', '/dls_sw/apps/EM/alpha_r3/relion-pipeline/')
+            relion_pipeline_home = os.getenv('RELION_PIPELINE_HOME','/dls_sw/apps/EM/relion_cryolo/CryoloRelion-master/')
             sys.path.append(relion_pipeline_home)
 
             self.log.info("PIPELINE HOME= {} ".format(relion_pipeline_home))
 
 
-            relion_it_script = str(Path(relion_pipeline_home).joinpath('relion_it.py'))
-            from relion_it import RelionItOptions
+            relion_it_script = str(Path(relion_pipeline_home).joinpath('relion_it_editted.py'))
+            from relion_it_editted import RelionItOptions
 
-            cluster_options = runpy.run_module('hamilton_options')
+            # all the options are rolled into one 
+
+            cluster_options = runpy.run_module('options')
 
         except ImportError:
             import traceback
@@ -153,8 +153,8 @@ class RelionRunner(CommonService):
 
         cmd = ('source /etc/profile.d/modules.sh;'
                 'module load hamilton;'
-                'module unload EM/relion_it;'
-                'module load EM/relion_it;',
+                'module unload EM/cryolo/yolo_it;'
+                'module load EM/cryolo/yolo_it;',
                 'dls-python',relion_it_script,str(user_options_file),'--continue')
 
         cmd_to_run = " ".join(cmd)
@@ -196,7 +196,13 @@ class RelionRunner(CommonService):
         """ sets up the folder structure relative to the messsage path """
 
 
-        from pathlib2 import Path
+        if sys.version_info[0] > 2:
+            from pathlib import Path
+        
+        else:
+            from pathlib2 import Path
+
+        
 
         visit_dir = folder_path.parents[2]
         workspace_dir = visit_dir / 'processed'
@@ -240,9 +246,14 @@ class RelionRunner(CommonService):
         # ln -s ../raw Movies
         # symlink /dls/m02/data/2019/cm22936-1/raw/ Movies
         
-
-
-        from pathlib2 import Path
+        import sys 
+        
+        if sys.version_info[0] > 2:
+            from pathlib import Path
+        
+        else:
+            from pathlib2 import Path
+        
         import os
 
 
