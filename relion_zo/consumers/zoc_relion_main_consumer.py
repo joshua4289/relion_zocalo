@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function
 from workflows.services.common_service import CommonService
 import workflows.recipe
 from subprocess import PIPE, Popen
-import json
+import json 
 import os, re
 try:
     import runpy
@@ -11,7 +11,7 @@ except ImportError:
 
 
 
-# Active MQ Scipion Consumer started as gda2
+
 #relion-it-constants
 
 PIPELINE_STAR = 'default_pipeline.star'
@@ -69,6 +69,7 @@ class RelionRunner(CommonService):
 
         self.log.info("Start relion through zocalo")
 
+        import sys
         if sys.version_info[0] > 2:
             from pathlib import Path
         
@@ -135,11 +136,11 @@ class RelionRunner(CommonService):
 
 
 
-
+        # TODO: don't know why the Popen cwd does not do this . 2 secs for NFS
         os.chdir(str(relion_dir))
         import time
         time.sleep(2)
-        # TODO: don't know why the Popen cwd does not do this . 2 secs for NFS
+
 
         logfile_out = open(str(Path.joinpath(relion_dir,'relion_runner.out')),'a+')
         logfile_err = open(str(Path.joinpath(relion_dir,'relion_runner.err')),'a+')
@@ -195,7 +196,7 @@ class RelionRunner(CommonService):
     def setup_folder_str(self,folder_path):
         """ sets up the folder structure relative to the messsage path """
 
-
+        import sys
         if sys.version_info[0] > 2:
             from pathlib import Path
         
@@ -247,7 +248,7 @@ class RelionRunner(CommonService):
         # symlink /dls/m02/data/2019/cm22936-1/raw/ Movies
         
         import sys 
-        
+
         if sys.version_info[0] > 2:
             from pathlib import Path
         
