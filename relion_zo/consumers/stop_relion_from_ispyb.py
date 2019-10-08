@@ -26,14 +26,21 @@ class Relionstop(CommonService):
     def stop_relion(self, rw, header, message):
         self.log.info("Stop relion through zocalo")
 
-        from pathlib2 import  Path
+        import os
+        import re
+        import sys
+        
+        if sys.version_info[0] > 2:
+            from pathlib import Path
+        
+        else:
+            from pathlib2 import Path
 
         ispyb_msg = message['session_path']
 
         ispyb_msg_path = Path(ispyb_msg)
 
-        import os
-        import re
+        
 
         session_path = ispyb_msg_path.parents[2]
         session_name = session_path.name
