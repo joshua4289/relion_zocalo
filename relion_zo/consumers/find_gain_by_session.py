@@ -11,7 +11,7 @@ if sys.version_info[0] > 2:
     from pathlib import PurePath
 else:
     from pathlib2 import Path
-    print(Path.__module__)
+    
 
 
 class Relionfindgain(CommonService):
@@ -96,14 +96,7 @@ class Relionfindgain(CommonService):
                 nospace_files = list(filter(no_space,files_accepted))
                 print(f'files nospace is {list(nospace_files)}')
                 # filter returns an iterator 
-                print (f'type is {type(nospace_files)}')
-                #print('length of the list is ')
-                #make no_space  a list by list(iter)
-                # because the paths generated will be changing dependent on 
-                # what is exposed to the __next__ method call
-                #  if length == 1 return else return from the base of the list 
-                #of files
-                
+
                 if not nospace_files:
                     return None
                     
@@ -113,65 +106,13 @@ class Relionfindgain(CommonService):
                     else:
                         return Path.joinpath(raw_folder_path).joinpath(str(nospace_files[0]))
                         
-                # try:
-                #     nospace_file =              #next(nospace_files) #next(nospace_files)
-                #     self.log.info(f'returning Path withim the function{nospace_file}')
-                #     yield (nospace_file) #Path.joinpath(raw_folder_path).joinpath(str(nospace_file))
-
-                # except StopIteration:
-                #     self.log.info('stop iteration reached ')
-                #     return None
-
-                # if len(list(nospace_files > 1 )):
-                #     return Path.joinpath(raw_folder_path).joinpath(str(list(nospace_files).pop)) 
-
-                # else:
-                # self.log.info('No relevant gain files found..continuing without Gain ')
-                # return  None
-
-                # if len(list(files)) > 0 :
-                #     """ iterate over the files list if space continue else return """
-
-                #     print(f'this is the list of files{list(files)}')    
-                    # files_accepted = map(no_space,files)                    
-                    # print(list(files))
-                    # print(f'files accepted are {files_accepted}')
-
-                    #print(list(files_accepted))
-                    
-                    # for f in files:
-                    
-                    #     #file_without_spaces = self.skip_path_with_spaces()
-                    #     file_without_spaces = [ Path(f) no_space(PurePath.name(f))]
-                    #     print(f'file without spaces is {file_without_spaces}')    
-
-                        
-                    #     if len(file_without_spaces) > 0:
-                    #         try:
-                    #             print(f'path found was {file_without_spaces}')
-                    #             return Path.joinpath(raw_folder_path).joinpath(str(f))  #joinpath(str(next(files))) 
-                    #         except StopIteration:
-                    #             print("list does not contain valid entries ")
-                    #             pass     
-                    #     else:
-                    #         self.log.info("file had spaces in it this is not suported")
-                    
-                    # for f in files:
-                    #     if self.skip_path_with_spaces(f):
-                    #         print('file had spaces in it not suported')
-                    #         continue
-                        
-                    # return Path.joinpath(raw_folder_path).joinpath(str(next(files)))    
-                    
-                    # print('No gain was found in {}'.format(raw_folder_path))
-                    # continue
-                    #(str(files[-1]))
+               
 
     def find_and_convert_gain(self,rw,header,message):
         #of ispyb_msg
         
         ispyb_msg = Path(message['session_path'])
-        #ispyb_msg= Path("/dls/tmp/jtq89441/dls/m02/data/2019/em12345-01/.ispyb/processed/ispyb_msg.json")
+        
 
         gain_path = self.find_gain_by_session(ispyb_msg)
         self.log.info("Gain path search was in {}".format(gain_path))
