@@ -22,6 +22,7 @@ setup(
             "RelionRunner = relion_zo.consumers.zoc_relion_main_consumer:RelionRunner",
             "Relionstop = relion_zo.consumers.stop_relion_from_ispyb:Relionstop",
             "Relionsubmitstop = relion_zo.consumers.stop_relion_pipeline:Relionsubmitstop",
+            "Relionfindgain = relion_zo.consumers.find_gain_by_session:Relionfindgain",
         ],
     },
     install_requires=requirements,
@@ -29,9 +30,9 @@ setup(
     include_package_data=True,
     name="relion_zo",
     packages=find_packages(),
-    python_requires='>=2.7.13,!= 3.0.*',
+    python_requires='>=3.6.*',
     setup_requires=setup_requirements,
-    version="0.4",
+    version="0.6",
     zip_safe=False,
 )
 
