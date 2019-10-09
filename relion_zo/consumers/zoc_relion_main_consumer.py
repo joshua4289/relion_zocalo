@@ -28,8 +28,9 @@ SECONDPASS_REF3D_FILE = 'RELION_IT_2NDPASS_3DREF'
 class RelionRunner(CommonService):
     '''A zocalo service for running Scipion'''
 
-    # Human readable service name
-    _service_name = "relion.relion_prod_ispyb"
+    # Human readable service name changed to dev 
+
+    _service_name = "relion.relion_dev_ispyb"
 
     # Logger name
     _logger_name = 'relion.zocalo.services.runner'
@@ -39,7 +40,7 @@ class RelionRunner(CommonService):
 
 		"""
 
-        queue_name = "relion.relion_prod_ispyb"
+        queue_name = "relion.relion_dev_ispyb"
         self.log.info("queue that is being listended to is %s" % queue_name)
         workflows.recipe.wrap_subscribe(self._transport, queue_name,
                                         self.run_relion, acknowledgement=True, log_extender=self.extend_log,
@@ -156,7 +157,7 @@ class RelionRunner(CommonService):
                 'module load hamilton;'
                 'module unload EM/cryolo/yolo_it;'
                 'module load EM/cryolo/yolo_it;',
-                'dls-python',relion_it_script,str(user_options_file),'--continue')
+                'python',relion_it_script,str(user_options_file),'--continue')
 
         cmd_to_run = " ".join(cmd)
 
@@ -164,6 +165,8 @@ class RelionRunner(CommonService):
 
         # this is intentional because the running_relion it checks crashes consumers
         self.transport.ack(header)
+
+        
         subprocess.Popen(cmd_to_run,stdout=logfile_out,stderr=logfile_err,shell=True)
 
         self.copy_running_to_frontend(str(relion_dir),str(ispyb_msg_dir))
