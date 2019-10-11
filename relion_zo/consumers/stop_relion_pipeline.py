@@ -8,7 +8,7 @@ class Relionsubmitstop(CommonService):
     '''A zocalo service for to stop Relion RELION_SUBMITTED_JOBS and RUNNING_* for relion from IsPyB '''
 
     # Human readable service name
-    _service_name = "relion.relion_stop_pipeline"
+    _service_name = "relion.reset"
 
     # Logger name
     _logger_name = 'relion.zocalo.services.runner'
@@ -18,7 +18,7 @@ class Relionsubmitstop(CommonService):
 
 		"""
 
-        queue_name = "relion.relion_stop_pipeline"
+        queue_name = "relion.reset"
         self.log.info("queue that is being listened to is %s" % queue_name)
         workflows.recipe.wrap_subscribe(self._transport, queue_name,
                                         self.stop_relion, acknowledgement=True, log_extender=self.extend_log,
@@ -27,7 +27,7 @@ class Relionsubmitstop(CommonService):
 
 
     def stop_relion(self, rw, header, message):
-        self.log.info("Stop relion through zocalo")
+        self.log.info("relion RESET through zocalo")
 
         import os
         import re
@@ -40,25 +40,18 @@ class Relionsubmitstop(CommonService):
             from pathlib2 import Path
     
 
-        ispyb_msg = message['session_path']
-
-        ispyb_msg_path = Path(ispyb_msg)
-
-        
-        
-        session_path = ispyb_msg_path.parents[2]
+        session_path  = Path(message['session_path'])
         session_name = session_path.name
-
         relion_project_dir = Path.joinpath(session_path).joinpath('processed').joinpath('relion_' + session_name)
 
 
         relion_jobs_file = Path.joinpath(relion_project_dir).joinpath('RELION_IT_SUBMITTED_JOBS')
-        ispyb_jobs_file = Path.joinpath(ispyb_msg_path.parent).joinpath('RELION_IT_SUBMITTED_JOBS')
+        ispyb_jobs_file = Path.joinpath(session_path).joinpath('.ispyb/processed/RELION_IT_SUBMITTED_JOBS')
 
         #start the remove only both exists this maybe opens you to timing issues needs improvement
         #remove from both dirs
 
-        if relion_jobs_file and ispyb_msg_path:
+        if relion_jobs_file and ispyb_jobs_file:
             try:
                 os.remove(str(relion_jobs_file))
                 self.log.info("{} submitted jobs file was removed ".format(relion_jobs_file))
