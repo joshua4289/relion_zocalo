@@ -7,7 +7,7 @@ class Relionstop(CommonService):
     '''A zocalo service for to stop Relion from IsPyB '''
 
     # Human readable service name
-    _service_name = "relion.relion_stop"
+    _service_name = "relion.stop"
 
     # Logger name
     _logger_name = 'relion.zocalo.services.runner'
@@ -17,7 +17,7 @@ class Relionstop(CommonService):
 
                 """
 
-        queue_name = "relion.relion_stop"
+        queue_name = "relion.stop"
         self.log.info("queue that is being listened to is %s" % queue_name)
         workflows.recipe.wrap_subscribe(self._transport, queue_name,
                                         self.stop_relion, acknowledgement=True, log_extender=self.extend_log,
@@ -36,13 +36,19 @@ class Relionstop(CommonService):
         else:
             from pathlib2 import Path
 
-        ispyb_msg = message['session_path']
+        #ispyb_msg = message['session_path']
 
-        ispyb_msg_path = Path(ispyb_msg)
-
+        #ispyb_msg_path = Path(ispyb_msg)
         
+        #implementation-choice:
+        #-----------------------
+        #Changed the messages that ispyb gives will be of the session
+        #for the stop events this is because the front-end needs to simply 
+        # send a zocalo messsage that needs to be consumed 
+        # there is seemingly no benifit to logging stop mesaages on 
+        # the file-system as tracked by greylog
 
-        session_path = ispyb_msg_path.parents[2]
+        session_path = Path(message['session_path'])
         session_name = session_path.name
 
         relion_project_dir = Path.joinpath(session_path).joinpath('processed').joinpath('relion_' + session_name)
