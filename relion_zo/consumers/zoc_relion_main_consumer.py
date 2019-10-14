@@ -29,7 +29,7 @@ class RelionRunner(CommonService):
 
     # Human readable service name changed to dev 
 
-    _service_name = "relion.relion_dev_ispyb"
+    _service_name = "relion.relion_prod_ispyb"
 
     # Logger name
     _logger_name = 'relion.zocalo.services.runner'
@@ -169,7 +169,7 @@ class RelionRunner(CommonService):
         #this is because if the main thread fails for whatever reason the ack will not be sent zocalo will then try to re-deliver the message 
         # the re-delivered message is guarinteed to crash because the RUNNING_RELION_IT file is present 
         # the front-end is designed to warn the user of this and expects a 'STOP' which clears the RUNNING_RELION_IT file 
-        
+
         subprocess.Popen(cmd_to_run,stdout=logfile_out,stderr=logfile_err,shell=True)
 
         self.copy_running_to_frontend(str(relion_dir),str(ispyb_msg_dir))
