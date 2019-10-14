@@ -21,7 +21,6 @@ PREPROCESS_SCHEDULE_PASS1 = 'PREPROCESS'
 PREPROCESS_SCHEDULE_PASS2 = 'PREPROCESS_PASS2'
 OPTIONS_FILE = 'relion-it-options.py' 
 SECONDPASS_REF3D_FILE = 'RELION_IT_2NDPASS_3DREF'
-#
 
 
 
@@ -30,7 +29,7 @@ class RelionRunner(CommonService):
 
     # Human readable service name changed to dev 
 
-    _service_name = "relion.relion_prod_ispyb"
+    _service_name = "relion.relion_dev_ispyb"
 
     # Logger name
     _logger_name = 'relion.zocalo.services.runner'
@@ -40,7 +39,7 @@ class RelionRunner(CommonService):
 
 		"""
 
-        queue_name = "relion.relion_prod_ispyb"
+        queue_name = "relion.relion_dev_ispyb"
         self.log.info("queue that is being listended to is %s" % queue_name)
         workflows.recipe.wrap_subscribe(self._transport, queue_name,
                                         self.run_relion, acknowledgement=True, log_extender=self.extend_log,
@@ -166,6 +165,10 @@ class RelionRunner(CommonService):
         # this is intentional because the running_relion it checks crashes consumers
         self.transport.ack(header)
 
+        # the ack is just before the main thread starts 
+        #this is because if the main thread fails for whatever reason the ack will not be sent zocalo will then try to re-deliver the message 
+        # the re-delivered message is guarinteed to crash because the RUNNING_RELION_IT file is present 
+        # the front-end is designed to warn the user of this and expects a 'STOP' which clears the RUNNING_RELION_IT file 
         
         subprocess.Popen(cmd_to_run,stdout=logfile_out,stderr=logfile_err,shell=True)
 
