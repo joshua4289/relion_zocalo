@@ -29,7 +29,7 @@ class RelionRunner(CommonService):
 
     # Human readable service name changed to dev 
 
-    _service_name = "relion.relion_prod_ispyb"
+    _service_name = "relion.start"
 
     # Logger name
     _logger_name = 'relion.zocalo.services.runner'
@@ -39,7 +39,7 @@ class RelionRunner(CommonService):
 
 		"""
 
-        queue_name = "relion.relion_prod_ispyb"
+        queue_name = "relion.start"
         self.log.info("queue that is being listended to is %s" % queue_name)
         workflows.recipe.wrap_subscribe(self._transport, queue_name,
                                         self.run_relion, acknowledgement=True, log_extender=self.extend_log,
