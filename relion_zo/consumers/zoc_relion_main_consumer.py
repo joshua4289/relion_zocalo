@@ -80,7 +80,7 @@ class RelionRunner(CommonService):
         from subprocess import Popen
         import sys
 
-        ispyb_msg = message ['session_path']
+        ispyb_msg = message ['relion_workflow']
         ispyb_msg_path = Path(ispyb_msg)
         ispyb_msg_dir = Path(ispyb_msg_path).parent
 
