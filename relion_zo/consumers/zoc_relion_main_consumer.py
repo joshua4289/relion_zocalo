@@ -45,21 +45,7 @@ class RelionRunner(CommonService):
                                         self.run_relion, acknowledgement=True, log_extender=self.extend_log,
                                         allow_non_recipe_messages=True)
 
-    def copy_running_to_frontend(self,relion_dir,ispyb_msg_path):
-
-        ''' finds the RUNNING_* and RELION_IT_SUBMITTED files in relion project and copies them to .ispyb/processing '''
-
-        import os
-        import shutil
-        import glob
-
-        cwd = relion_dir
-        os.chdir(str(relion_dir))
-
-        for f in glob.glob(r'RUNNING_*'):
-            shutil.copy(f,ispyb_msg_path)
-            #add logging
-            self.log.info("copied {} to {}".format(str(f),str(ispyb_msg_path)))
+    
 
 
 
@@ -163,19 +149,38 @@ class RelionRunner(CommonService):
         import subprocess
 
         # this is intentional because the running_relion it checks crashes consumers
-        self.transport.ack(header)
+        
 
         # the ack is just before the main thread starts 
         #this is because if the main thread fails for whatever reason the ack will not be sent zocalo will then try to re-deliver the message 
         # the re-delivered message is guarinteed to crash because the RUNNING_RELION_IT file is present 
         # the front-end is designed to warn the user of this and expects a 'STOP' which clears the RUNNING_RELION_IT file 
 
+
         subprocess.Popen(cmd_to_run,stdout=logfile_out,stderr=logfile_err,shell=True)
-
+        time.sleep(0.1)
         self.copy_running_to_frontend(str(relion_dir),str(ispyb_msg_dir))
+        #self.log.info("%s *** was copied to %s *** "%(relion_dir,ispyb_msg_dir))
+        self.transport.ack(header)
 
-        self.log.info("relion processing started ")
+        self.log.info("relion processing started")
 
+
+    def copy_running_to_frontend(self,relion_dir,ispyb_msg_path):
+
+        ''' finds the RUNNING_* and RELION_IT_SUBMITTED files in relion project and copies them to .ispyb/processing '''
+
+        import os
+        import shutil
+        import glob
+
+        cwd = relion_dir
+        os.chdir(str(relion_dir))
+
+        for f in glob.glob(r'RUNNING_*'):
+            shutil.copy(f,ispyb_msg_path)
+            #add logging
+            self.log.info("RUNNING STATE files copied {} to {}".format(str(f),str(ispyb_msg_path)))
 
 
     def check_running_relion_its(self):
