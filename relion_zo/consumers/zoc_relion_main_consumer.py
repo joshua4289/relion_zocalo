@@ -159,8 +159,20 @@ class RelionRunner(CommonService):
 
         subprocess.Popen(cmd_to_run,stdout=logfile_out,stderr=logfile_err,shell=True)
         time.sleep(0.1)
-        self.copy_running_to_frontend(str(relion_dir),str(ispyb_msg_dir))
-        #self.log.info("%s *** was copied to %s *** "%(relion_dir,ispyb_msg_dir))
+
+        # START relion and wait for status files or timeout 
+        time_counter = 0 
+        time_to_disk = 15 
+
+        while time_counter < time_to_disk:
+            time.sleep(1)
+            time_counter += 1
+            if Path.joinpath(relion_dir,RUNNING_FILE).exists() and Path.joinpath(relion_dir,SETUP_CHECK_FILE).exists(): 
+                self.copy_running_to_frontend(str(relion_dir),str(ispyb_msg_dir))
+                break
+
+
+        self.log.info("RUNNNING file copy occurred")
         self.transport.ack(header)
 
         self.log.info("relion processing started")
