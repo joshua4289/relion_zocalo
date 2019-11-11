@@ -14,8 +14,8 @@ def test_check_service_names():
     relion_stop_pipe = Relionsubmitstop()
     relion_stop_pipe = relion_stop_pipe.get_name()
 
-    assert  relion_run_name == "relion.relion_prod_ispyb"
-    assert  relion_stop_name == "relion.relion_stop"
-    assert  relion_stop_pipe == "relion.relion_stop_pipeline"
+    assert  relion_run_name == "relion.start"
+    assert  relion_stop_name == "relion.stop"
+    assert  relion_stop_pipe == "relion.reset"
 
 

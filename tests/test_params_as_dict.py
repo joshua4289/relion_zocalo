@@ -11,7 +11,7 @@ from relion_zo.consumers.zoc_relion_main_consumer import RelionRunner
 
 def test_user_input():
     r = RelionRunner()
-    json_user_params = r.params_as_dict(user_ip='/dls/tmp/jtq89441/dls/m02/data/2019/em12345-01/.ispyb/processing/relion_msg.json')
+    json_user_params = r.params_as_dict(user_ip='/dls/tmp/jtq89441/dls/m02/data/2019/em12345-01/.ispyb/processed/relion_msg.json')
     print(json_user_params)
 
 
