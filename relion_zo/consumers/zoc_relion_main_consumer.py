@@ -93,11 +93,12 @@ class RelionRunner(CommonService):
                 self.log,info('please dowmload from https://pypi.org/project/dls-relion-yolo-it/)
 
             else:
-                global relion_home 
-                relion_home =  relion_pipeline_home.stdout().decode('utf-8').rstrip()
-                sys.path.append(relion_home)
-                self.log.info("PIPELINE HOME= {} ".format(relion_pipeline_home))
-
+                global relion_it_script 
+                relion_it_script =  relion_pipeline_home.stdout().decode('utf-8').rstrip()
+                relion_it_config_home = os.getenv('RELION_PIPELINE_CONFIG_HOME','/dls_sw/apps/EM/relion_cryolo/config/')
+                sys.path.append(relion_it_config_home)
+                self.log.info("PIPELINE CONFIG HOME= {} ".format(relion_it_config_home))
+                
 
             #relion_it_script = str(Path(relion_home).joinpath('relion_it_editted.py'))
             from relion_home import RelionItOptions
