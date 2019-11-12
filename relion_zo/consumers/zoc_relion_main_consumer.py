@@ -83,19 +83,28 @@ class RelionRunner(CommonService):
         self.link_movies(relion_dir)
 
         try:
+            # instead because relion-it  is installed in the cryolo-env from 
+            # pip install dls-relion-yolo-it
 
-            relion_pipeline_home = os.getenv('RELION_PIPELINE_HOME','/dls_sw/apps/EM/relion_cryolo/CryoloRelion-master/')
-            sys.path.append(relion_pipeline_home)
+            relion_pipeline_home = subprocess.run(["which","cryolo_relion_it"],stdout=subprocess.PIPE]) #os.getenv('RELION_PIPELINE_HOME','/dls_sw/apps/EM/relion_cryolo/CryoloRelion-master/')
+            
+            if relion_pipeline_home is None:
+                self.log.error('You have not setup your environment correctly')
+                self.log,info('please dowmload from https://pypi.org/project/dls-relion-yolo-it/)
 
-            self.log.info("PIPELINE HOME= {} ".format(relion_pipeline_home))
+            else:
+                global relion_home 
+                relion_home =  relion_pipeline_home.stdout().decode('utf-8').rstrip()
+                sys.path.append(relion_home)
+                self.log.info("PIPELINE HOME= {} ".format(relion_pipeline_home))
 
 
-            relion_it_script = str(Path(relion_pipeline_home).joinpath('relion_it_editted.py'))
-            from relion_it_editted import RelionItOptions
+            #relion_it_script = str(Path(relion_home).joinpath('relion_it_editted.py'))
+            from relion_home import RelionItOptions
 
             # all the options are rolled into one 
 
-            cluster_options = runpy.run_module('options')
+            #cluster_options = runpy.run_module('options')
 
         except ImportError:
             import traceback
