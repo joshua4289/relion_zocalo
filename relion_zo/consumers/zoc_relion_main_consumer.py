@@ -280,12 +280,13 @@ class RelionRunner(CommonService):
         
         import os
 
+        # the path is relative to keep vizualization easy from the relion GUI
+        
 
-        session_dir = Path(relion_dir).parents[1]
 
-
-
-        raw_dir = session_dir.joinpath('raw/')
+        raw_dir = Path('../../raw')
+        
+        #raw_dir = session_dir.joinpath('raw/')
         # check if symlink exists for Movies in relion_dir
         if not relion_dir.joinpath('Movies').is_symlink():
             relion_dir.joinpath('Movies').symlink_to(raw_dir)
