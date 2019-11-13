@@ -4,7 +4,7 @@
 import sys
 from setuptools import setup, find_packages
 
-requirements = ["workflows", "zocalo","pathlib2"]
+requirements = ["workflows", "zocalo"]
 setup_requirements = []
 
 
