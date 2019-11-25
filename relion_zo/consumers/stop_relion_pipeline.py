@@ -39,6 +39,9 @@ class Relionsubmitstop(CommonService):
         else:
             from pathlib2 import Path
     
+        self.log.info(message)
+
+        #self.transport.ack(header)
 
         session_path  = Path(message['session_path'])
         session_name = session_path.name
@@ -51,25 +54,17 @@ class Relionsubmitstop(CommonService):
         #start the remove only both exists this maybe opens you to timing issues needs improvement
         #remove from both dirs
 
-        if relion_jobs_file and ispyb_jobs_file:
-            try:
-                os.remove(str(relion_jobs_file))
-                self.log.info("{} submitted jobs file was removed ".format(relion_jobs_file))
-                os.remove(str(ispyb_msg_path))
-                self.log.info("{} submitted jobs file was removed ".format(ispyb_jobs_file))
+        if not relion_project_dir.exists():
+            self.log.info('relion project directory does not exist')
+            #self.transport.ack(header)
+            #sys.exit(0)
+        else:
+            run_files = [f for f in os.listdir(str(relion_project_dir)) if re.match(r'RUNNING*', f)]
+            self.log.info("%s has asked to be stopped" % (str(session_path)))
 
-            except:
-                self.log.info("file {} not found".format(relion_jobs_file))
-                self.log.info("file {} not found".format(ispyb_jobs_file))
-
-        run_files = [f for f in os.listdir(str(relion_project_dir)) if re.match(r'RUNNING*', f)]
-
-
-        self.log.info("%s has asked to be stopped" % (str(session_path)))
-
-        for r in run_files:
-            file_to_delete = session_path.joinpath('processed').joinpath(relion_project_dir).joinpath(r)
-            file_to_delete_ispyb = session_path.joinpath('.ispyb').joinpath('processed').joinpath(r)
+            for r in run_files:
+                file_to_delete = session_path.joinpath('processed').joinpath(relion_project_dir).joinpath(r)
+                file_to_delete_ispyb = session_path.joinpath('.ispyb').joinpath('processed').joinpath(r)
 
             if file_to_delete.exists:
                 self.log.info("%s will be removed " % (file_to_delete))
@@ -84,6 +79,19 @@ class Relionsubmitstop(CommonService):
                     self.log.info("Nothing to delete %s has been deleted " % file_to_delete)
 
 
-        #in both cases ack
+            if relion_jobs_file and ispyb_jobs_file:
+
+                try:
+                    os.remove(str(relion_jobs_file))
+                    self.log.info("{} submitted jobs file was removed ".format(relion_jobs_file))
+                    os.remove(str(ispyb_msg_path))
+                    self.log.info("{} submitted jobs file was removed ".format(ispyb_jobs_file))
+
+                except:
+                    self.log.info("file {} not found".format(relion_jobs_file))
+                    self.log.info("file {} not found".format(ispyb_jobs_file))
+                    #in both cases ack
+
+
         self.transport.ack(header)
 
