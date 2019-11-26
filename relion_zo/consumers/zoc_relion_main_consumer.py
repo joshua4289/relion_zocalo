@@ -83,15 +83,18 @@ class RelionRunner(CommonService):
         self.link_movies(relion_dir)
 
         try:
-
-            relion_pipeline_home = os.getenv('RELION_PIPELINE_HOME','/dls_sw/apps/EM/relion_cryolo/CryoloRelion-master/')
+            # this will revert to the hard-coded default only if the module does not 
+            # have an environment variable set 
+            
+            relion_pipeline_home = os.getenv('RELION_PIPELINE_HOME','/dls_sw/apps/EM/relion_cryolo/live/Cryolo_relion3.0/relion_yolo_it')
             sys.path.append(relion_pipeline_home)
 
             self.log.info("PIPELINE HOME= {} ".format(relion_pipeline_home))
 
 
-            relion_it_script = str(Path(relion_pipeline_home).joinpath('relion_it_editted.py'))
-            from relion_it_editted import RelionItOptions
+            relion_it_script = str(Path(relion_pipeline_home).joinpath('cryolo_relion_it.py'))
+            self.log.info( '***********relion-it script imported is %s'%relion_it_script)
+            from cryolo_relion_it import RelionItOptions
 
             # all the options are rolled into one 
 
@@ -140,8 +143,8 @@ class RelionRunner(CommonService):
 
         cmd = ('source /etc/profile.d/modules.sh;'
                 'module load hamilton;'
-                'module unload EM/cryolo/yolo_it;'
-                'module load EM/cryolo/yolo_it;',
+                'module unload EM/cryolo/relion_it;'
+                'module load EM/cryolo/relion_it;',
                 'python',relion_it_script,str(user_options_file),'--continue')
 
         cmd_to_run = " ".join(cmd)
