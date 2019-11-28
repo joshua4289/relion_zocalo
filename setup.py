@@ -32,7 +32,7 @@ setup(
     packages=find_packages(),
     python_requires='>=3.6.*',
     setup_requires=setup_requirements,
-    version="1.1",
+    version="1.2",
     zip_safe=False,
 )
 
