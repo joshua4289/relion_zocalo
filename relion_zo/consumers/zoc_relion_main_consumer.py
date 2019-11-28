@@ -25,7 +25,7 @@ SECONDPASS_REF3D_FILE = 'RELION_IT_2NDPASS_3DREF'
 
 
 class RelionRunner(CommonService):
-    '''A zocalo service for running Scipion'''
+    '''A zocalo service for running Relion '''
 
     # Human readable service name changed to dev 
 
