@@ -65,11 +65,9 @@ class Relionsubmitstop(CommonService):
             for r in run_files:
                 file_to_delete = session_path.joinpath('processed').joinpath(relion_project_dir).joinpath(r)
                 file_to_delete_ispyb = session_path.joinpath('.ispyb').joinpath('processed').joinpath(r)
-
-            if file_to_delete.exists:
-                self.log.info("%s will be removed " % (file_to_delete))
-                self.log.info("%s ispyb file will be removed " % (file_to_delete_ispyb))
-
+                if file_to_delete.exists():
+                    self.log.info("%s will be removed " % (file_to_delete))
+                    self.log.info("%s ispyb file will be removed " % (file_to_delete_ispyb))
                 try:
                     os.remove(str(file_to_delete))
                     os.remove(str(file_to_delete_ispyb))
@@ -79,17 +77,17 @@ class Relionsubmitstop(CommonService):
                     self.log.info("Nothing to delete %s has been deleted " % file_to_delete)
 
 
-            if relion_jobs_file and ispyb_jobs_file:
+                if relion_jobs_file and ispyb_jobs_file:
 
-                try:
-                    os.remove(str(relion_jobs_file))
-                    self.log.info("{} submitted jobs file was removed ".format(relion_jobs_file))
-                    os.remove(str(ispyb_msg_path))
-                    self.log.info("{} submitted jobs file was removed ".format(ispyb_jobs_file))
+                    try:
+                        os.remove(str(relion_jobs_file))
+                        self.log.info("{} submitted jobs file was removed ".format(relion_jobs_file))
+                        os.remove(str(ispyb_msg_path))
+                        self.log.info("{} submitted jobs file was removed ".format(ispyb_jobs_file))
 
-                except:
-                    self.log.info("file {} not found".format(relion_jobs_file))
-                    self.log.info("file {} not found".format(ispyb_jobs_file))
+                    except:
+                        self.log.info("file {} not found".format(relion_jobs_file))
+                        self.log.info("file {} not found".format(ispyb_jobs_file))
                     #in both cases ack
 
 
