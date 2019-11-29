@@ -4,7 +4,7 @@
 import sys
 from setuptools import setup, find_packages
 
-requirements = ["workflows", "zocalo","schedule","ispyb-api==5.4.1"]
+requirements = ["workflows", "zocalo","schedule","ispyb==5.4.1"]
 setup_requirements = []
 
 
@@ -32,7 +32,7 @@ setup(
     packages=find_packages(),
     python_requires='>=3.6.*',
     setup_requires=setup_requirements,
-    version="1.5",
+    version="1.4",
     zip_safe=False,
 )
 
