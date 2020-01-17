@@ -16,12 +16,12 @@ else:
 
 class Relionfindgain(CommonService):
     
-    _service_name = "relion.relion_find_gain"
+    _service_name = "relion.find_gain"
     _logger_name = 'relion.zocalo.services.runner'
     
     def initializing(self):
         """Subscribe to the per_image_analysis queue. Received messages must be acknowledged."""
-        queue_name = "relion.relion_find_gain"
+        queue_name = "relion.find_gain"
         self.log.info("queue that is being listened to is %s" % queue_name)
         workflows.recipe.wrap_subscribe(self._transport, queue_name,
                                         self.find_and_convert_gain, acknowledgement=True, log_extender=self.extend_log,
@@ -79,18 +79,18 @@ class Relionfindgain(CommonService):
             import os 
             
             
-            raw_folder_path = session_path.parents[2].joinpath('raw')
-            print(str(raw_folder_path))
+            processing_folder_path = session_path.parents[2].joinpath('processing')
+            print(str(processing_folder_path))
 
             def no_space(name):
                 if " " in str(name):
-                    print ('spaces not supported in name ')
+                    print (f"spaces not supported in name {name}")
                     return False 
                 return True
 
 
 
-            for root, dirs, files in os.walk(str(raw_folder_path)):
+            for root, dirs, files in os.walk(str(processing_folder_path)):
                 files_accepted = filter(lambda x: x.endswith('.dm4') or 'gain' in x,files)
                 self.log.info(f'files that were found initial{list(files)}')
                 nospace_files = list(filter(no_space,files_accepted))
@@ -99,12 +99,14 @@ class Relionfindgain(CommonService):
 
                 if not nospace_files:
                     return None
+                
+                # this returns the first element from the list that dos not contain spaces in the name 
                     
                 for f in nospace_files:
                     if len(nospace_files) == 1:
-                        return Path.joinpath(raw_folder_path).joinpath(f)
+                        return Path.joinpath(processing_folder_path).joinpath(f)
                     else:
-                        return Path.joinpath(raw_folder_path).joinpath(str(nospace_files[0]))
+                        return Path.joinpath(processing_folder_path).joinpath(str(nospace_files[0]))
                         
                
 
@@ -115,7 +117,7 @@ class Relionfindgain(CommonService):
         
 
         gain_path = self.find_gain_by_session(ispyb_msg)
-        self.log.info("Gain path search was in {}".format(gain_path))
+        self.log.info("Gain path found was in {}".format(gain_path))
         
         if gain_path is not None :
             
