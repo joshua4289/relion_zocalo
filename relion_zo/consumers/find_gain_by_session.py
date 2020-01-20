@@ -28,17 +28,33 @@ class Relionfindgain(CommonService):
                                         allow_non_recipe_messages=True)
     
     
+    def is_epu_session(self,session_path):
+        
+        """ function returns True if raw folder has raw/GridSquare_*/Data/ """
+        
+   
+        from pathlib import PurePath
+    
+        if any("Grid" in p for p in PurePath(session_path).parts):
+            return True 
+        else:
+            return  False
+        
 
     
     def convert_dm4_to_mrc(self,file_ip,file_op='Gain.mrc'):
         """ (str,str) calls dmmrc from imod using latest defualt module of imod """
         cmd = ('module load EM/imod;')
 
-        convert_command = ["dm2mrc", file_ip,file_op] 
-
+        
+        escape_slashes = str(file_ip).replace(" ",'\ ')
+        
+        convert_command = ["dm2mrc",escape_slashes,file_op]
+        
         cmd += " ".join(arg for arg in convert_command)
         
         self.log.info("convert command is {} ".format(cmd))
+        
 
         return cmd 
 
@@ -69,11 +85,7 @@ class Relionfindgain(CommonService):
     def find_gain_by_session(self,session_path):
         
             """ 1.User checks tick box in front end 
-            2. gets a path Checks in the raw folder only on top-level (because find is computationally expensive)
-            3.returns the gain  full path 
-            
-            it will expect a .dm4 or file with 'gain'  in name in the top level skips files with spaces
-            
+            2. checks the processing folder for a file ending with .dm4 returns it 
             """
             
             import os 
@@ -91,31 +103,41 @@ class Relionfindgain(CommonService):
 
 
             for root, dirs, files in os.walk(str(processing_folder_path)):
-                files_accepted = filter(lambda x: x.endswith('.dm4') or 'gain' in x,files)
+                files_accepted = list(filter(lambda x: x.endswith('.dm4'),files))
                 self.log.info(f'files that were found initial{list(files)}')
-                nospace_files = list(filter(no_space,files_accepted))
-                print(f'files nospace is {list(nospace_files)}')
+                self.log.info(f"files with dm4 extension are {files_accepted}")
+                
+                
+                #nospace_files = list(filter(no_space,files_accepted))
+                #print(f'files nospace is {list(nospace_files)}')
                 # filter returns an iterator 
 
-                if not nospace_files:
-                    return None
+                # if not files_accepted:
+                #     self.log.info("No dm4 file was found ")
+                #     return None
+                
+                # if not nospace_files:
+                #     return None
                 
                 # this returns the first element from the list that dos not contain spaces in the name 
-                    
-                for f in nospace_files:
-                    if len(nospace_files) == 1:
-                        return Path.joinpath(processing_folder_path).joinpath(f)
-                    else:
-                        return Path.joinpath(processing_folder_path).joinpath(str(nospace_files[0]))
-                        
-               
+                print(type(files_accepted))    
+                return Path.joinpath(processing_folder_path).joinpath(files_accepted[-1])
+         
+
 
     def find_and_convert_gain(self,rw,header,message):
-        #of ispyb_msg
         
         ispyb_msg = Path(message['session_path'])
         
-
+        # change this find_gain_by_session logic 
+        
+        # return the raw list 
+        # find the file ending with dm4 with spaces 
+        # call dm2mrc and name it to a linux-fiendly name
+        # if it's an EPU session flip otherwise don't
+         
+        
+        
         gain_path = self.find_gain_by_session(ispyb_msg)
         self.log.info("Gain path found was in {}".format(gain_path))
         
