@@ -39,13 +39,15 @@ class RelionRunner(CommonService):
 
 		"""
 
-        queue_name = "relion.start"
+        queue_name = "relion.devstart"
         self.log.info("queue that is being listended to is %s" % queue_name)
         workflows.recipe.wrap_subscribe(self._transport, queue_name,
                                         self.run_relion, acknowledgement=True, log_extender=self.extend_log,
                                         allow_non_recipe_messages=True)
-
     
+    def get_session_type(message):
+        """ given a message add in the session-type """
+        pass     
 
 
 
@@ -116,14 +118,26 @@ class RelionRunner(CommonService):
 
         user_options_file = relion_dir.joinpath('relion_it_options.py')
 
-
-
+        # before you write out read the message agian for session-type 
+        
+        acquisition_softwares = ['EPU','SerialEM']
+        
+        acquisition_sw = self.params_as_dict(ispyb_msg).get('session_type')
+        
+              
+                      
+        
+        
 
         with open( str(user_options_file),'w+') as uop:
             relion_params.print_options(out_file=uop)
             self.log.info("user-params written in  %s " %str(user_options_file))
-
-
+            if acquisition_sw in acquisition_softwares:
+                uop.write(f"""session_type={acquisition_sw}""")
+            else:
+                uop.write(f"""session_type=None""")
+                self.log.error("Aquisition Software not supported")
+                    
 
         # TODO: don't know why the Popen cwd does not do this . 2 secs for NFS
         os.chdir(str(relion_dir))
