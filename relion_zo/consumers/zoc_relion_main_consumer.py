@@ -45,12 +45,6 @@ class RelionRunner(CommonService):
                                         self.run_relion, acknowledgement=True, log_extender=self.extend_log,
                                         allow_non_recipe_messages=True)
     
-    def get_session_type(message):
-        """ given a message add in the session-type """
-        pass     
-
-
-
 
     def run_relion(self,rw,header, message):
         """ main method to do all the setup and run relion-it """
@@ -69,12 +63,15 @@ class RelionRunner(CommonService):
         import sys
 
         ispyb_msg = message ['relion_workflow']
+        #can put this in the msg
+        number_of_raw_dirs = 5
+        
         ispyb_msg_path = Path(ispyb_msg)
         ispyb_msg_dir = Path(ispyb_msg_path).parent
 
         #SETUP: folders belonging to dls structure
 
-        visit_dir ,workspace_dir,relion_dir = self.setup_folder_str(ispyb_msg_path)
+        visit_dir ,workspace_dir,relion_dir = self.setup_folder_str(ispyb_msg_path,number_of_raw_dirs)
 
         self.log.info("visit: %s" %visit_dir)
         self.log.info("workspace: %s " %workspace_dir)
@@ -82,7 +79,7 @@ class RelionRunner(CommonService):
 
         
 
-        self.link_movies(relion_dir)
+        self.link_movies(relion_dir,number_of_raw_dirs)
 
         try:
             # this will revert to the hard-coded default only if the module does not 
@@ -233,7 +230,7 @@ class RelionRunner(CommonService):
 
                 #exit(0)
 
-    def setup_folder_str(self,folder_path):
+    def setup_folder_str(self,folder_path,number_raw_dirs):
         """ sets up the folder structure relative to the messsage path """
 
         import sys
@@ -243,28 +240,27 @@ class RelionRunner(CommonService):
         else:
             from pathlib2 import Path
 
+        # There will probably be seperate visit dirs to clearly seperate samples relion_em12345_1 ,relion_em12345_2 etc 
         
+                
+        for i in range(1,number_raw_dirs):
+            dump = folder_path.parent
+            
+            visit_dir = Path(f'{dump}_{i}')  
+            self.log.info(visit_dir)
 
-        visit_dir = folder_path.parents[2]
-        workspace_dir = visit_dir / 'processed'
+            project_name = 'relion_'+ str(visit_dir.stem)
 
-        workspace_dir.mkdir(parents=True, exist_ok=True)
-
-        project_name = 'relion_'+ str(visit_dir.stem)
-
-        relion_dir = Path(workspace_dir/project_name)
-        relion_dir.mkdir(parents=True, exist_ok=True)
-
-        movies_dir = Path(visit_dir/'raw')
-        movies_dir.mkdir(parents=True, exist_ok=True)
-        
-        
-        
-
-
-
-
-        return visit_dir,movies_dir,relion_dir
+            workspace_dir = Path(f'{visit_dir}').joinpath(f'processed_{i}')
+            workspace_dir.mkdir(parents=True, exist_ok=True)
+            
+            relion_dir = Path(workspace_dir/project_name)
+            relion_dir.mkdir(parents=True, exist_ok=True)
+            
+            movies_dir = Path(visit_dir/'raw_{i}')
+            movies_dir.mkdir(parents=True, exist_ok=True)
+            
+            return visit_dir,movies_dir,relion_dir
 
 
     def params_as_dict(self,user_ip):
@@ -277,7 +273,7 @@ class RelionRunner(CommonService):
         return user_dict
 
 
-    def link_movies(self,relion_dir):
+    def link_movies(self,relion_dir,num_raw_folders):
         """ links Movies session/raw folder  """
 
         """ links Movies session/raw folder name into a relion project  """
@@ -288,6 +284,7 @@ class RelionRunner(CommonService):
         # symlink /dls/m02/data/2019/cm22936-1/raw/ Movies
         
         import sys 
+        import re 
 
         if sys.version_info[0] > 2:
             from pathlib import Path
@@ -297,21 +294,38 @@ class RelionRunner(CommonService):
         
         import os
 
+        
         # the path is relative to keep vizualization easy from the relion GUI
         
-
-
-        raw_dir = Path('../../raw')
+        #TODO:
+        
+        #total_raw_folders needs to got from UAS/ISPyB 
+        
+        
+        
+        
+        if  num_raw_folders == 1:
+            raw_dir = Path('../../raw')
         
         #raw_dir = session_dir.joinpath('raw/')
         # check if symlink exists for Movies in relion_dir
-        if not relion_dir.joinpath('Movies').is_symlink():
-            relion_dir.joinpath('Movies').symlink_to(raw_dir)
+            if not relion_dir.joinpath('Movies').is_symlink():
+                relion_dir.joinpath('Movies').symlink_to(raw_dir)
+            else:
+                self.log.info("symlink already exists continue without session setup")
         else:
-            self.log.info("symlink already exists continue without session setup")
-
-
-
+            self.log.info(f"attempting to link {num_raw_folders} raw folders ")
+            
+            for i in range(1,num_raw_folders):
+                
+                raw_dir = Path(f'../../raw_{i}')
+                relion_dir.joinpath(f'Movies_{i}')
+                
+                if not relion_dir.joinpath(f'Movies_{i}').is_symlink():
+                    
+                    relion_dir.joinpath(f'Movies_{i}').symlink_to(raw_dir)
+            
+            self.log.info(f'{num_raw_folders}folders symlink created')
 
 
 
