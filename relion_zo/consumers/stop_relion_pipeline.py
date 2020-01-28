@@ -18,7 +18,7 @@ class Relionsubmitstop(CommonService):
 
 		"""
 
-        queue_name = "relion.reset"
+        queue_name = "relion.devreset"
         self.log.info("queue that is being listened to is %s" % queue_name)
         workflows.recipe.wrap_subscribe(self._transport, queue_name,
                                         self.stop_relion, acknowledgement=True, log_extender=self.extend_log,
@@ -27,6 +27,10 @@ class Relionsubmitstop(CommonService):
 
 
     def stop_relion(self, rw, header, message):
+        """ this service takes a session folder as input and removes Relion pipeline state files RUNNING_* and RELION_IT_SUBMITTED resetting the pipeline 
+        
+        input: /dls/m00/data/2020/em_12345 """
+        
         self.log.info("relion RESET through zocalo")
 
         import os
@@ -60,11 +64,13 @@ class Relionsubmitstop(CommonService):
             #sys.exit(0)
         else:
             run_files = [f for f in os.listdir(str(relion_project_dir)) if re.match(r'RUNNING*', f)]
+            self.log.info(f"run_files that matched were {run_files}")
+            
             self.log.info("%s has asked to be stopped" % (str(session_path)))
 
             for r in run_files:
                 file_to_delete = session_path.joinpath('processed').joinpath(relion_project_dir).joinpath(r)
-                file_to_delete_ispyb = session_path.joinpath('.ispyb').joinpath('processed').joinpath(r)
+                file_to_delete_ispyb = session_path.joinpath('.ispyb').joinpath('processing').joinpath(r)
                 if file_to_delete.exists():
                     self.log.info("%s will be removed " % (file_to_delete))
                     self.log.info("%s ispyb file will be removed " % (file_to_delete_ispyb))
