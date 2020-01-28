@@ -108,19 +108,8 @@ class Relionfindgain(CommonService):
                 self.log.info(f"files with dm4 extension are {files_accepted}")
                 
                 
-                #nospace_files = list(filter(no_space,files_accepted))
-                #print(f'files nospace is {list(nospace_files)}')
-                # filter returns an iterator 
-
-                # if not files_accepted:
-                #     self.log.info("No dm4 file was found ")
-                #     return None
                 
-                # if not nospace_files:
-                #     return None
-                
-                # this returns the first element from the list that dos not contain spaces in the name 
-                print(type(files_accepted))    
+                    
                 return Path.joinpath(processing_folder_path).joinpath(files_accepted[-1])
          
 
