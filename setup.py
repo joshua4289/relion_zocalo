@@ -23,6 +23,7 @@ setup(
             "Relionstop = relion_zo.consumers.stop_relion_from_ispyb:Relionstop",
             "Relionsubmitstop = relion_zo.consumers.stop_relion_pipeline:Relionsubmitstop",
             "Relionfindgain = relion_zo.consumers.find_gain_by_session:Relionfindgain",
+	    "Relionflipgain = relion_zo.consumers.flip_gain:Relionflipgain"
         ],
     },
     install_requires=requirements,
