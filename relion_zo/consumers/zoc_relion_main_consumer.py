@@ -63,7 +63,9 @@ class RelionRunner(CommonService):
         import sys
 
         ispyb_msg = message ['relion_workflow']
-        #can put this in the msg
+
+        #TODO: can get this from the payload in from front-end hard coded for now
+
         number_of_raw_dirs = 5
         
         ispyb_msg_path = Path(ispyb_msg)
@@ -73,9 +75,9 @@ class RelionRunner(CommonService):
 
         visit_dir ,workspace_dir,relion_dir = self.setup_folder_str(ispyb_msg_path,number_of_raw_dirs)
 
-        self.log.info("visit: %s" %visit_dir)
-        self.log.info("workspace: %s " %workspace_dir)
-        self.log.info("relion_dir: %s " %relion_dir)
+        self.log.info(f"visit:{visit_dir}")
+        self.log.info(f"workspace:{workspace_dir}")
+        self.log.info(f"relion_dir:{relion_dir}")
 
         
 
@@ -242,25 +244,25 @@ class RelionRunner(CommonService):
 
         # There will probably be seperate visit dirs to clearly seperate samples relion_em12345_1 ,relion_em12345_2 etc 
         
-                
-        for i in range(1,number_raw_dirs):
-            dump = folder_path.parent
-            
-            visit_dir = Path(f'{dump}_{i}')  
+        print(f"number of raw_dirs passed was {number_raw_dirs}")
+        for i in range(1,number_raw_dirs+1):
+            self.log.info(f"index is {i}")
+            visit_dir = folder_path.parents[2]#visit_dir
             self.log.info(visit_dir)
 
-            project_name = 'relion_'+ str(visit_dir.stem)
-
-            workspace_dir = Path(f'{visit_dir}').joinpath(f'processed_{i}')
+            project_name = 'relion_'+ str(visit_dir.stem) + '_' + str(i)
+            print(f'{project_name}')
+            workspace_dir = Path(visit_dir/f'processed_{i}')
+            print(f"workspace dir is {workspace_dir}")
             workspace_dir.mkdir(parents=True, exist_ok=True)
             
             relion_dir = Path(workspace_dir/project_name)
             relion_dir.mkdir(parents=True, exist_ok=True)
             
-            movies_dir = Path(visit_dir/'raw_{i}')
+            movies_dir = Path(visit_dir/f'raw_{i}')
             movies_dir.mkdir(parents=True, exist_ok=True)
             
-            return visit_dir,movies_dir,relion_dir
+        return visit_dir,movies_dir,relion_dir
 
 
     def params_as_dict(self,user_ip):
@@ -295,14 +297,7 @@ class RelionRunner(CommonService):
         import os
 
         
-        # the path is relative to keep vizualization easy from the relion GUI
-        
-        #TODO:
-        
-        #total_raw_folders needs to got from UAS/ISPyB 
-        
-        
-        
+
         
         if  num_raw_folders == 1:
             raw_dir = Path('../../raw')
@@ -319,13 +314,16 @@ class RelionRunner(CommonService):
             for i in range(1,num_raw_folders):
                 
                 raw_dir = Path(f'../../raw_{i}')
-                relion_dir.joinpath(f'Movies_{i}')
+                linked_movie_dir = relion_dir.joinpath(f'Movies_{i}')
                 
                 if not relion_dir.joinpath(f'Movies_{i}').is_symlink():
                     
                     relion_dir.joinpath(f'Movies_{i}').symlink_to(raw_dir)
             
             self.log.info(f'{num_raw_folders}folders symlink created')
+
+            return linked_movie_dir
+
 
 
 
