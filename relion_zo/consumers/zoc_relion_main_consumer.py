@@ -122,7 +122,7 @@ class RelionRunner(CommonService):
         
         acquisition_softwares = ['EPU','SerialEM']
         
-        acquisition_sw = self.params_as_dict(ispyb_msg).get('session_type')
+        acquisition_sw = self.params_as_dict(ispyb_msg).get('acquisition_software')
         
               
                       
@@ -133,9 +133,9 @@ class RelionRunner(CommonService):
             relion_params.print_options(out_file=uop)
             self.log.info("user-params written in  %s " %str(user_options_file))
             if acquisition_sw in acquisition_softwares:
-                uop.write(f"""session_type='{acquisition_sw}'""")
+                uop.write(f"""acquisition_software='{acquisition_sw}'""")
             else:
-                uop.write(f"""session_type='None'""")
+                uop.write(f"""acquisition_software='None'""")
                 self.log.error("Aquisition Software not supported")
                     
 
